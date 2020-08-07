@@ -7,6 +7,8 @@
             src="/js/analytics.js"></script>
     <script async=""
             src="/js/gtm.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
     <script type="text/javascript" src="/js/jquery.min.js"></script>
 	<script type="text/javascript" src="/js/jquery.tablesorter.js">
 	</script>
@@ -21577,8 +21579,21 @@
         </tbody>
     </table>
 
-    <div id="results">
-        <div class="unique_pairs"></div>
+    <div class="container">
+        <div class="row">
+            <div id="results" class="col-md-8">
+                <div class="unique_pairs"></div>
+                <table class="statistic table table-striped">
+                    <thead class="thead-dark">
+                    <th>Pair</th>
+                    <th>Win</th>
+                    <th>Loss</th>
+                    <th>Total Profit</th>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -21595,8 +21610,51 @@
             }
 
         })
-        unique_pairs = unique_pairs.join(', ');
-        $('.unique_pairs').text(unique_pairs);
+
+        let unique_pairs_text = unique_pairs;
+        $('.unique_pairs').text(unique_pairs_text.join(', '));
+
+        let pairs =  {};
+        $(unique_pairs).each(function (index, pair) {
+            if (typeof pairs[pair] == 'undefined') {
+                pairs[pair] = {
+                    count: 0,
+                    loss: 0,
+                    win: 0,
+                    total_win: 0
+                }
+            }
+        })
+
+        $('#robot_statistic tbody tr').each(function () {
+            let pair = $(this).find('td:nth-child(5)').text();
+            let profit = parseFloat($(this).find('td:nth-child(14)').text());
+            pairs[pair].count ++;
+            if (profit >= 0) {
+                pairs[pair].win ++;
+            } else {
+                pairs[pair].loss ++;
+            }
+
+            pairs[pair].total_win += profit;
+        })
+
+        $(unique_pairs).each(function (index, pair) {
+            let tr = $('<tr/>');
+            tr.append($('<td />', {
+                text: pair
+            })).append($('<td />', {
+                text: (pairs[pair].win / pairs[pair].count * 100).toFixed(2) + '%'
+            })).append($('<td />', {
+                text: (pairs[pair].loss / pairs[pair].count * 100).toFixed(2) + '%'
+            })).append($('<td />', {
+                text: parseFloat(pairs[pair].total_win).toFixed(2)
+            }))
+
+            tr.appendTo('#results .statistic tbody');
+        })
+
+        $("#results .statistic").tablesorter();
 	});
 
 
