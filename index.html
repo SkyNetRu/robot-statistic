@@ -21586,9 +21586,11 @@
                 <table class="statistic table table-striped">
                     <thead class="thead-dark">
                     <th>Pair</th>
-                    <th>Win</th>
-                    <th>Loss</th>
-                    <th>Total Profit</th>
+                    <th>Win %</th>
+                    <th>Total win</th>
+                    <th>Loss %</th>
+                    <th>Total Loss</th>
+                    <th>Total Result</th>
                     </thead>
                     <tbody></tbody>
                 </table>
@@ -21621,7 +21623,9 @@
                     count: 0,
                     loss: 0,
                     win: 0,
-                    total_win: 0
+                    total_win: 0,
+                    total_result: 0,
+                    total_loss: 0
                 }
             }
         })
@@ -21632,11 +21636,13 @@
             pairs[pair].count ++;
             if (profit >= 0) {
                 pairs[pair].win ++;
+                pairs[pair].total_win += profit;
             } else {
                 pairs[pair].loss ++;
+                pairs[pair].total_loss += profit;
             }
 
-            pairs[pair].total_win += profit;
+            pairs[pair].total_result += profit;
         })
 
         $(unique_pairs).each(function (index, pair) {
@@ -21646,10 +21652,14 @@
             })).append($('<td />', {
                 text: (pairs[pair].win / pairs[pair].count * 100).toFixed(2) + '%'
             })).append($('<td />', {
+                text: parseFloat(pairs[pair].total_win).toFixed(2)
+            })).append($('<td />', {
                 text: (pairs[pair].loss / pairs[pair].count * 100).toFixed(2) + '%'
             })).append($('<td />', {
-                text: parseFloat(pairs[pair].total_win).toFixed(2)
-            }))
+                text: parseFloat(pairs[pair].total_loss).toFixed(2)
+            })).append($('<td />', {
+                    text: parseFloat(pairs[pair].total_result).toFixed(2)
+                }))
 
             tr.appendTo('#results .statistic tbody');
         })
